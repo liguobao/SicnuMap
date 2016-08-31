@@ -1,18 +1,10 @@
 ﻿
 $(function () {
-    $('#Get58Data').bind('click', function (e) {
-        e.preventDefault();
-
-        Get58DataClick();
-        e.stopPropagation();
-    });
-
-   
-
+    
     map = new AMap.Map("container", {
         resizeEnable: true,
         zoomEnable: true,
-        center: [104.201844, 30.565233],
+        center: [104.20148, 30.565967],
         zoom: 17
     });
 
@@ -39,33 +31,20 @@ $(function () {
 
     //将上面input自动补全结果置于页面最上层
     $(".amap-sug-result").css("z-index", 9999);
+
+    workAddress = "四川师范大学成龙校区图书馆";
+    var marker = new AMap.Marker({
+        position: [104.198524, 30.565219],
+        title: '学院办公楼',
+        map: map
+    });
+    marker.content = "<div>学院办公楼<div>";
+    marker.on('click', function (e) {
+        addTransfer(e, '四川师范大学办公楼');
+    });
+
     
 })
-
-
-function MapMoveToLocationCity() {
-    map.on('moveend', getCity);
-    function getCity() {
-        map.getCity(function (data) {
-            if (data['province'] && typeof data['province'] === 'string') {
-
-                var cityinfo = (data['city'] || data['province']);
-                cityName = cityinfo.substring(0, cityinfo.length - 1);
-                ConvertCityCNNameToShortCut();
-
-                document.getElementById('IPLocation').innerHTML = '地图中心所在城市：' + cityName;
-
-            }
-        });
-    }
-}
-
-function ConvertCityCNNameToShortCut() {
-    var filterarray = $.grep(allCityInfo, function (obj) {
-        return obj.cityName == cityName;
-    });
-    cityNameCNPY = filterarray instanceof Array ? filterarray[0].shortCut : filterarray != null ? filterarray.shortCut : "";
-}
 
 
 function LacationTypeChange() {
@@ -75,75 +54,6 @@ function LacationTypeChange() {
     } else {
         MapMoveToLocationCity();
     }
-}
-
-
-function Get58DataClick() {
-    $("#Get58Data").attr("disabled", true);
-    $.AMUI.progress.start();
-
-    if ($("input[name='lacationType']:checked").val() == '0') {
-        ConvertCityCNNameToShortCut();
-    }
-
-    var costFrom = $("#costFrom").val();
-    var costTo = $("#costTo").val();
-
-    if (isNaN(costFrom) || isNaN(costTo)) {
-        alert("请输入正确的整数。");
-        $("#Get58Data").attr("disabled", false);
-        $.AMUI.progress.done();
-        return;
-    }
-
-
-    $.ajax({
-        type: "post",
-        url: getDataAction,
-        data: { costFrom: costFrom, costTo: costTo, cnName: cityNameCNPY },
-        success:
-            function (result) {
-                if (result.IsSuccess) {
-                    delRentLocation();
-                    var rent_locations = new Set();
-                    result.HouseInfos.forEach(function (item, index) {
-                        rent_locations.add(item);
-                    });
-                    rent_locations.forEach(function (element, index) {
-                        addMarkerByAddress(element.HouseLocation, element.Money, element.HouseURL);
-                    });
-                    $("#Get58Data").attr("disable", false);
-
-                } else {
-                    alert(result.Error);
-                }
-                $("#Get58Data").attr("disabled", false);
-                $.AMUI.progress.done();
-            }
-    });
-}
-
-
-function showCityInfo(map) {
-    //实例化城市查询类
-    var citysearch = new AMap.CitySearch();
-    //自动获取用户IP，返回当前城市
-    citysearch.getLocalCity(function (status, result) {
-        if (status === 'complete' && result.info === 'OK') {
-            if (result && result.city && result.bounds) {
-                var cityinfo = result.city;
-                var citybounds = result.bounds;
-                cityName = cityinfo.substring(0, cityinfo.length - 1);
-                ConvertCityCNNameToShortCut();
-
-                document.getElementById('IPLocation').innerHTML = '您当前所在城市：' + cityName;
-                //地图显示当前城市
-                map.setBounds(citybounds);
-            }
-        } else {
-            document.getElementById('IPLocation').innerHTML = result.info;
-        }
-    });
 }
 
 
@@ -235,22 +145,7 @@ function addMarkerByAddress(address, memoy, href, housetime, price,markBG) {
 
 
 function addTransfer(e, address) {
-    if (vehicle != 'WALKING') {
-        infoWindow.setContent(e.target.content);
-        infoWindow.open(map, e.target.getPosition());
-        if (amapTransfer) amapTransfer.clear();
-        amapTransfer = new AMap.Transfer({
-            map: map,
-            policy: AMap.TransferPolicy.LEAST_TIME,
-            city: cityName,
-            panel: 'transfer-panel'
-        });
-        amapTransfer.search([{
-            keyword: workAddress
-        }, {
-            keyword: address
-        }], function (status, result) { })
-    } else {
+{
         infoWindow.setContent(e.target.content);
         infoWindow.open(map, e.target.getPosition());
         if (amapTransfer) amapTransfer.clear();
@@ -266,7 +161,7 @@ function addTransfer(e, address) {
             { keyword: address }
         ], function (status, result) {
         });
-    }
+}
 }
 
 

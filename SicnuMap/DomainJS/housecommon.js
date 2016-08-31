@@ -1,14 +1,5 @@
 ﻿
 $(function () {
-    $('#Get58Data').bind('click', function (e) {
-        e.preventDefault();
-
-        Get58DataClick();
-        e.stopPropagation();
-    });
-
-   
-
     map = new AMap.Map("container", {
         resizeEnable: true,
         zoomEnable: true,
@@ -63,13 +54,6 @@ function MapMoveToLocationCity() {
     }
 }
 
-function ConvertCityCNNameToShortCut() {
-    var filterarray = $.grep(allCityInfo, function (obj) {
-        return obj.cityName == cityName;
-    });
-    cityNameCNPY = filterarray instanceof Array ? filterarray[0].shortCut : filterarray != null ? filterarray.shortCut : "";
-}
-
 
 function LacationTypeChange() {
     if ($("input[name='lacationType']:checked").val() == '1') {
@@ -79,53 +63,6 @@ function LacationTypeChange() {
         MapMoveToLocationCity();
     }
 }
-
-
-function Get58DataClick() {
-    $("#Get58Data").attr("disabled", true);
-    $.AMUI.progress.start();
-
-    if ($("input[name='lacationType']:checked").val() == '0') {
-        ConvertCityCNNameToShortCut();
-    }
-
-    var costFrom = $("#costFrom").val();
-    var costTo = $("#costTo").val();
-
-    if (isNaN(costFrom) || isNaN(costTo)) {
-        alert("请输入正确的整数。");
-        $("#Get58Data").attr("disabled", false);
-        $.AMUI.progress.done();
-        return;
-    }
-
-
-    $.ajax({
-        type: "post",
-        url: getDataAction,
-        data: { costFrom: costFrom, costTo: costTo, cnName: cityNameCNPY },
-        success:
-            function (result) {
-                if (result.IsSuccess) {
-                    delRentLocation();
-                    var rent_locations = new Set();
-                    result.HouseInfos.forEach(function (item, index) {
-                        rent_locations.add(item);
-                    });
-                    rent_locations.forEach(function (element, index) {
-                        addMarkerByAddress(element.HouseLocation, element.Money, element.HouseURL);
-                    });
-                    $("#Get58Data").attr("disable", false);
-
-                } else {
-                    alert(result.Error);
-                }
-                $("#Get58Data").attr("disabled", false);
-                $.AMUI.progress.done();
-            }
-    });
-}
-
 
 function showCityInfo(map) {
     //实例化城市查询类
@@ -137,7 +74,6 @@ function showCityInfo(map) {
                 var cityinfo = result.city;
                 var citybounds = result.bounds;
                 cityName = cityinfo.substring(0, cityinfo.length - 1);
-                ConvertCityCNNameToShortCut();
 
                 document.getElementById('IPLocation').innerHTML = '您当前所在城市：' + cityName;
                 //地图显示当前城市
@@ -205,7 +141,7 @@ function loadWorkRange(x, y, t, color, v) {
     });
 }
 
-function addMarkerByAddress(address, memoy, href, housetime, price,markBG) {
+function addMarkerByAddress(address, href,markBG) {
     var geocoder = new AMap.Geocoder({
         city: cityName,
         radius: 1000
@@ -227,7 +163,7 @@ function addMarkerByAddress(address, memoy, href, housetime, price,markBG) {
             //    content: "租金：" + price
             //});
 
-            rentMarker.content = "<div><a target = '_blank' href='" + href + "'>房源：" + address + "<br/>租金：" + memoy + "   发布时间：" +housetime+ "</a><div>";
+            rentMarker.content = "<div><a target = '_blank' href='" + href + "'>" + address + "<br/></a><div>";
             rentMarker.on('click', function (e) {
                 addTransfer(e, address);
             });

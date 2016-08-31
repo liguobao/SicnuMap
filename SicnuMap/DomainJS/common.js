@@ -3,8 +3,8 @@ $(function () {
     map = new AMap.Map("container", {
         resizeEnable: true,
         zoomEnable: true,
-        center: [121.297428, 31.1345],
-        zoom: 11
+        center: [104.20148, 30.565967],
+        zoom: 17
     });
 
     scale = new AMap.Scale();
@@ -24,16 +24,21 @@ $(function () {
 
     AMap.event.addListener(auto, "select", workLocationSelected);
 
-    $.getJSON("pv.json", function (data) {
-        $("#lblPVCount").text(data.PVCount);
-    });
+    //$.getJSON("pv.json", function (data) {
+    //    $("#lblPVCount").text(data.PVCount);
+    //});
 
     //初始化打开侧边栏
-    $('#search-offcanvas').offCanvas({ effect: 'overlay' });
+   // $('#search-offcanvas').offCanvas({ effect: 'overlay' });
 
     //将上面input自动补全结果置于页面最上层
     $(".amap-sug-result").css("z-index", 9999);
     
+    for(var index=0;index <sicnuAddressArry.length;index ++)
+    {
+        addMarkerByAddress(sicnuAddressArry[index], '#', '');
+    }
+
 })
 
 
@@ -147,13 +152,14 @@ function addMarkerByAddress(address, href,markBG) {
         radius: 1000
     });
 
+   
+
     geocoder.getLocation(address, function (status, result) {
         if (status === "complete" && result.info === 'OK') {
             var geocode = result.geocodes[0];
             rentMarker = new AMap.Marker({
                 map: map,
                 title: address,
-                icon: 'IMG/Gradient/' + markBG,
                 position: [geocode.location.getLng(), geocode.location.getLat()]
             });
             rentMarkerArray.push(rentMarker);

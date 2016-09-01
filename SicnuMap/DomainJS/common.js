@@ -34,7 +34,7 @@ $(function () {
     //将上面input自动补全结果置于页面最上层
     $(".amap-sug-result").css("z-index", 9999);
     
-   
+   MarkerPoint();
 
 })
 
@@ -242,4 +242,55 @@ function loadWorkLocation() {
             map.setZoomAndCenter(12, [x, y]);
         }
     })
+}
+
+/*
+*标记各地点
+*MarkerPoint
+**/
+function MarkerPoint() {
+    //地点名称及坐标
+    var point = [
+        { name: "正大门", longitude: "104.198947", latitude: "30.562237" },
+        { name: "图书馆", longitude: "104.201519", latitude: "30.566003" },
+        { name: "计算机科学学院实验中心", longitude: "104.20002", latitude: "30.563466" },
+        { name: "第一实验大楼", longitude: "104.200589", latitude: "30.563133" },
+        { name: "第二实验大楼", longitude: "104.196594", latitude: "30.5641" },
+        { name: "第三实验大楼", longitude: "104.197667", latitude: "30.563573" },
+        { name: "第一教学楼A区", longitude: "104.199233", latitude: "30.563407" },
+        { name: "第一教学楼C区", longitude: "104.198171", latitude: "30.564469" },
+        { name: "办公楼", longitude: "104.19859", latitude: "30.565347" },
+        { name: "音乐教学楼", longitude: "104.201004", latitude: "30.561781" },
+        { name: "舞蹈教学楼", longitude: "104.202677", latitude: "30.560608" },
+        { name: "第一运动场", longitude: "104.203042", latitude: "30.564442" },
+        { name: "第一运动场2号门", longitude: "104.203074", latitude: "30.562964" },
+        { name: "第一运动场3号门", longitude: "104.203675", latitude: "30.563269" },
+        { name: "第二运动场", longitude: "104.198793", latitude: "30.567527" },
+        { name: "第三运动场", longitude: "104.200553", latitude: "30.568368" },
+        { name: "第三运动场1号门", longitude: "104.200285", latitude: "30.567342" },
+        { name: "第三运动场2号门", longitude: "104.201197", latitude: "30.568239" },
+        { name: "训练馆", longitude: "104.202398", latitude: "30.566779" },
+        { name: "乒乓馆", longitude: "104.201851", latitude: "30.567342" },
+        { name: "篮球场", longitude: "104.197763", latitude: "30.568654" },
+        { name: "网球场", longitude: "104.198804", latitude: "30.569227" },
+        { name: "师大现代花园", longitude: "104.198042", latitude: "30.57186" }
+
+    ];
+    for (var i = 0; i < point.length; i++) {
+        //添加点
+        var marker = new AMap.Marker({
+            position: [point[i].longitude, point[i].latitude],
+            title: point[i].name,
+            map: map
+        });
+        //弹出信息
+        marker.content = "<div>" + point[i].name + "</div><div><p style='width:100%;height:1px;background:#ccc;'><a>详情</a></div>";
+        marker.on('click', function (e) {
+            infoWindow.setContent(e.target.content);
+            infoWindow.open(map, e.target.getPosition());
+        });
+       
+       
+    } map.setFitView();
+    
 }

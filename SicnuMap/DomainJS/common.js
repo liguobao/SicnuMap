@@ -34,10 +34,7 @@ $(function () {
     //将上面input自动补全结果置于页面最上层
     $(".amap-sug-result").css("z-index", 9999);
     
-    for(var index=0;index <sicnuAddressArry.length;index ++)
-    {
-        addMarkerByAddress(sicnuAddressArry[index], '#', '');
-    }
+   
 
 })
 
